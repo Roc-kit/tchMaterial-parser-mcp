@@ -1,0 +1,4 @@
+[submodule "upstream/tchMaterial-parser"]
+	path = upstream/tchMaterial-parser
+	url = https://github.com/happycola233/tchMaterial-parser.git
+	branch = main
