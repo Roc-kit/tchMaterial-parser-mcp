@@ -40,3 +40,17 @@ upstream/tchMaterial-parser/ 是 Git submodule。它的所有权属于上游项�
 
 默认不在 submodule 内维护私有 patch。
 
+## File write boundary
+
+download_material 只能写入 MCP Server 自己配置的下载根目录。模型不能通过 tool 参数提供任意输出路径。
+
+默认根目录：
+
+    ~/Downloads/tchMaterial-parser
+
+覆盖方式：
+
+    TCHMATERIAL_MCP_DOWNLOAD_DIR=/path/to/materials
+
+这使文件系统写入权限保持在 Host/Server 配置侧，而不是交给模型决定。
+

@@ -8,8 +8,16 @@ version = "0.1.0"
 description = "MCP adapter for tchMaterial-parser"
 readme = "README.md"
 requires-python = ">=3.10"
-license = {text = "MIT"}
-dependencies = []
+license = "MIT"
+license-files = ["LICENSE"]
+dependencies = [
+    "mcp>=2,<3",
+    "pypdf>=5,<7",
+    "requests>=2.31,<3",
+]
+
+[project.scripts]
+"tchmaterial-parser-mcp" = "tchmaterial_parser_mcp.server:main"
 
 [project.optional-dependencies]
 dev = [

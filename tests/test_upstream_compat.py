@@ -51,3 +51,15 @@ def test_auth_api_contract_still_exists() -> None:
     functions, _ = _top_level_symbols(UPSTREAM_PACKAGE / "auth.py")
     assert "parse_token_input" in functions
 
+
+def test_network_and_bookmark_contracts_still_exist() -> None:
+    network_functions, network_classes = _top_level_symbols(UPSTREAM_PACKAGE / "network.py")
+    bookmark_functions, _ = _top_level_symbols(UPSTREAM_PACKAGE / "bookmarks.py")
+    config_functions, _ = _top_level_symbols(UPSTREAM_PACKAGE / "config.py")
+
+    assert "request_headers" in network_functions
+    assert "TimeoutSession" in network_classes
+    assert "add_bookmarks" in bookmark_functions
+    assert "load_config" in config_functions
+    assert "load_access_token" in config_functions
+

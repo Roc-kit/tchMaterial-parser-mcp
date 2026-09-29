@@ -21,6 +21,12 @@ else
     PYTHON="python3"
 fi
 
+if command -v uv >/dev/null 2>&1 && [[ -x "$ROOT/.venv/bin/python" ]]; then
+    uv pip install --python "$PYTHON" -e "$SUBMODULE"
+elif [[ -x "$ROOT/.venv/bin/python" ]]; then
+    "$PYTHON" -m pip install -e "$SUBMODULE"
+fi
+
 "$PYTHON" -m pytest tests/test_upstream_compat.py tests/test_layering.py
 
 echo
