@@ -12,3 +12,22 @@ def test_download_tool_has_no_output_directory_parameter() -> None:
     annotations = tools.download_material.__annotations__
     assert "output_dir" not in annotations
 
+
+def test_download_tool_defaults_to_pdf_only(monkeypatch) -> None:
+    captured = {}
+
+    def fake_download(resource_id_or_url, add_pdf_bookmarks, skip_existing, pdf_only):
+        captured.update(
+            resource_id_or_url=resource_id_or_url,
+            add_pdf_bookmarks=add_pdf_bookmarks,
+            skip_existing=skip_existing,
+            pdf_only=pdf_only,
+        )
+        return {"files": []}
+
+    monkeypatch.setattr(adapters, "download_material", fake_download)
+
+    tools.download_material("book-1")
+
+    assert captured["pdf_only"] is True
+

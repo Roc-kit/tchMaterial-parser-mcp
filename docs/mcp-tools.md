@@ -37,7 +37,12 @@
 - resource_id_or_url: 必填。
 - include_bookmarks: 默认 false。true 时额外解析 PDF 章节书签。
 
-返回文件标题、格式、版本、分类目录、下载 URL 和章节信息。
+返回文件标题、格式、版本、分类目录、下载 URL 和章节信息，同时返回：
+
+- pdf_count：PDF 数量。
+- non_pdf_count：非 PDF 关联资源数量。
+- has_related_resources：是否存在 MP3 等关联资源。
+- file_formats：当前页面包含的文件格式。
 
 ## download_material
 
@@ -48,8 +53,20 @@
 - resource_id_or_url: 必填。
 - add_pdf_bookmarks: 默认 true。
 - skip_existing: 默认 true。
+- pdf_only: 默认 true。只下载 PDF；显式设为 false 才会下载关联音频等其他资源。
 
 下载根目录由服务端环境变量 TCHMATERIAL_MCP_DOWNLOAD_DIR 控制；默认使用 ~/Downloads/tchMaterial-parser。tool 本身没有任意 output_dir 参数。
+
+英语教材页面通常还关联大量 MP3。推荐交互流程：
+
+1. 用户提出下载教材。
+2. AI 先调用 resolve_material。
+3. 如果 has_related_resources=false，直接按 PDF 下载。
+4. 如果 has_related_resources=true，且用户尚未说明是否需要配套资源，先询问：
+   “只下载 PDF，还是连配套音频等资源一起下载？”
+5. 用户未特别要求时，使用默认 pdf_only=true。
+
+因此默认行为仍然是只下载教材 PDF，不会自动把几十个 MP3 一并下载。
 
 返回每个文件的 status：
 

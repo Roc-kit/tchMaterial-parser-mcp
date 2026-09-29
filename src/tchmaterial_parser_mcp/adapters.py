@@ -216,9 +216,15 @@ def resolve_material(resource_id_or_url: str, include_bookmarks: bool = False) -
         }
         for resource in resources
     ]
+    pdf_count = sum(item["file_format"].casefold() == "pdf" for item in resolved)
+    non_pdf_count = len(resolved) - pdf_count
     return {
         "source_url": source_url,
         "resource_count": len(resolved),
+        "pdf_count": pdf_count,
+        "non_pdf_count": non_pdf_count,
+        "has_related_resources": non_pdf_count > 0,
+        "file_formats": sorted({item["file_format"].casefold() for item in resolved}),
         "resources": resolved,
     }
 
@@ -379,14 +385,25 @@ def download_material(
     resource_id_or_url: str,
     add_pdf_bookmarks: bool = True,
     skip_existing: bool = True,
+    pdf_only: bool = True,
 ) -> dict[str, object]:
-    """Resolve and download all files associated with one material page."""
+    """Resolve and download resources associated with one material page.
+
+    Textbook pages may expose a large number of related audio files.  The MCP
+    defaults to PDF-only downloads because the primary use case is downloading
+    textbooks.  Set pdf_only=False explicitly when related audio or other file
+    types are desired.
+    """
 
     _load_saved_credentials()
     source_url = _source_url(resource_id_or_url)
     resources = upstream_parse(source_url, add_pdf_bookmarks)
     if not resources:
         raise ValueError("资源解析失败，或该页面没有可下载资源")
+    if pdf_only:
+        resources = [resource for resource in resources if resource.file_format.casefold() == "pdf"]
+        if not resources:
+            raise ValueError("该页面没有可下载的 PDF 资源")
 
     root = download_directory()
     root.mkdir(parents=True, exist_ok=True)

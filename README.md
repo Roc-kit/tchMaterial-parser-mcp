@@ -80,5 +80,5 @@ download_material 不接受任意输出目录参数，避免模型把文件写�
 
 ## 当前状态
 
-第一版已提供 search_materials、get_material、resolve_material、download_material 四个 MCP Tool，并使用官方 MCP Python SDK v2 的 stdio transport。
+第一版已提供 search_materials、get_material、resolve_material、download_material 四个 MCP Tool，并使用官方 MCP Python SDK v2 的 stdio transport。download_material 默认只下载 PDF；如果教材还包含 MP3 等关联资源，推荐先由 resolve_material 检查并询问用户是否需要一起下载，用户未特别要求时仍保持 PDF-only。
 

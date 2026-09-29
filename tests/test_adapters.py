@@ -80,3 +80,37 @@ def test_download_one_writes_atomically(monkeypatch, tmp_path: Path) -> None:
     assert target.read_bytes() == b"abcdef"
     assert not Path(f"{target}.tmp").exists()
 
+
+def test_download_material_filters_related_audio_by_default(monkeypatch, tmp_path: Path) -> None:
+    resources = [
+        ResourceInfo("教材", "https://example.invalid/book.pdf", "pdf", [], None, ()),
+        ResourceInfo("配套听力", "https://example.invalid/audio.mp3", "mp3", [], None, ()),
+    ]
+    monkeypatch.setattr(adapters, "_source_url", lambda _value: "https://basic.smartedu.cn/example")
+    monkeypatch.setattr(adapters, "_load_saved_credentials", lambda: None)
+    monkeypatch.setattr(adapters, "upstream_parse", lambda _url, _bookmarks: resources)
+    monkeypatch.setattr(adapters, "download_directory", lambda: tmp_path)
+    monkeypatch.setattr(adapters, "_download_one", lambda resource, path: 123)
+
+    result = adapters.download_material("book-1")
+
+    assert len(result["files"]) == 1
+    assert result["files"][0]["file_format"] == "pdf"
+
+
+def test_resolve_material_reports_related_resources(monkeypatch) -> None:
+    resources = [
+        ResourceInfo("教材", "https://example.invalid/book.pdf", "pdf", [], None, ()),
+        ResourceInfo("配套听力", "https://example.invalid/audio.mp3", "mp3", [], None, ()),
+    ]
+    monkeypatch.setattr(adapters, "_load_saved_credentials", lambda: None)
+    monkeypatch.setattr(adapters, "_source_url", lambda _value: "https://basic.smartedu.cn/example")
+    monkeypatch.setattr(adapters, "upstream_parse", lambda _url, _bookmarks: resources)
+
+    result = adapters.resolve_material("book-1")
+
+    assert result["pdf_count"] == 1
+    assert result["non_pdf_count"] == 1
+    assert result["has_related_resources"] is True
+    assert result["file_formats"] == ["mp3", "pdf"]
+
